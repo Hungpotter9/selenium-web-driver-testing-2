@@ -74,6 +74,7 @@ public class Topic_01_Check_Environment {
         Assert.assertEquals(chromeDriver.getCurrentUrl(), "https://www.facebook.com/");
         chromeDriver.quit(); //quit chromeDriver
     }
+    //Define TC01, TC02, TC03 to run in Chrome and Edge
 
     @AfterClass
     public void afterClass() {
