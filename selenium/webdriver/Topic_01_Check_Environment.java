@@ -75,6 +75,7 @@ public class Topic_01_Check_Environment {
         chromeDriver.quit(); //quit chromeDriver
     }
     //Define TC01, TC02, TC03 to run in Chrome and Edge why can commit and push?
+    // Pull ok, now edit and push to Git Hub
 
     @AfterClass
     public void afterClass() {
