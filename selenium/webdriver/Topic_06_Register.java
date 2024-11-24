@@ -3,11 +3,14 @@ package webdriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.TimeUnit;
+
+import static java.awt.SystemColor.text;
 
 public class Topic_06_Register {
     WebDriver driver;
@@ -53,6 +56,7 @@ public class Topic_06_Register {
         driver.findElement(By.xpath("//input[@name='uid']")).sendKeys(userName);
         driver.findElement(By.xpath("//input[@name='password']")).sendKeys(password);
         driver.findElement(By.xpath("//input[@name='btnLogin']")).click();
+        //Assert.assertTrue(text.contains("Welcome To Manager's Page of Guru99 Bank"));
 
     }
     @Test
