@@ -2,12 +2,15 @@ package webdriver;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Topic_07_Xpath_Css {
@@ -24,7 +27,8 @@ public class Topic_07_Xpath_Css {
         }
 
         driver = new FirefoxDriver();
-        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+        //driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
         driver.manage().window().maximize();
     }
 
@@ -42,6 +46,10 @@ public class Topic_07_Xpath_Css {
         driver.findElement(By.id("txtCPassword")).clear();
         driver.findElement(By.xpath("//input[@id='txtPhone']")).clear();
         driver.findElement(By.xpath("//button[text()='ĐĂNG KÝ'and@type='submit']")).click();
+        List<WebElement> listElement = driver.findElements(By.xpath("//button[@type='all'"));
+        //driver.getCurrentUrl().contains("");
+        Assert.assertEquals(driver.getCurrentUrl().contains(""), "");
+
         // Verify
         Assert.assertEquals(driver.findElement(By.xpath("//label[@id='txtFirstname-error']"))
                 .getText(),"Vui lòng nhập họ tên");
