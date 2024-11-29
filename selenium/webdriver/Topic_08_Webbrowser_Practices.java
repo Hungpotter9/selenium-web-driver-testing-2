@@ -1,5 +1,6 @@
 package webdriver;
 
+import org.checkerframework.checker.units.qual.A;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -9,6 +10,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Topic_08_Webbrowser_Practices {
@@ -344,6 +346,43 @@ public class Topic_08_Webbrowser_Practices {
         SleepInSeconds(3);
         Assert.assertEquals(driver.
                 getCurrentUrl(), "http://live.techpanda.org/index.php/customer/account/loginPost/");
+    }
+
+    @Test
+    public void TC_14_Success() {
+        driver.get(url1);
+        driver.findElement(By.xpath("//div[@class = 'footer-container']//a[@title = 'My Account']"))
+                .click();
+        SleepInSeconds(3);
+        // Dang ky tai khoan tu dong
+        driver.findElement(By.xpath("//a[@title ='Create an Account']")).click();
+        SleepInSeconds(2);
+        String firstName = "Automation" , lastName = "FC", emailAddress = generateEmail(), password = "123456789";
+        String fullName = firstName + " " + lastName;
+        driver.findElement(By.cssSelector("input#firstname")).sendKeys(firstName);
+        driver.findElement(By.cssSelector("input#middlename")).sendKeys(lastName);
+        driver.findElement(By.cssSelector("input#lastname")).sendKeys(lastName);
+        driver.findElement(By.xpath("//input[@id='email_address']")).sendKeys(emailAddress);
+        driver.findElement(By.cssSelector("input#password")).sendKeys(password);
+        driver.findElement(By.cssSelector("input#confirmation")).sendKeys(password);
+        driver.findElement(By.xpath("//span[text()='Register']")).click();
+
+        //Login
+
+
+        //Verify
+        String contactInfo = driver.findElement(By.
+                xpath("//h3[text()='Contact Information']/parent::div/following-sibling::div/p")).getText();
+        Assert.assertTrue(contactInfo.contains(fullName));
+        Assert.assertTrue(contactInfo.contains(emailAddress));
+
+
+
+
+    }
+
+    public String generateEmail(){
+        return "automation" + new Random().nextInt(99999) + "@gmail.com";
     }
 
     public void SleepInSeconds(long timeInSecond){
