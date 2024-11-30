@@ -133,9 +133,9 @@ public class Topic_09_Textbox_TextArea_Dropbox {
         //Assert.assertEquals(driver.findElement(By.xpath("//input[@name='firstName']/parent::div"))
          //       .getDomProperty("value"), firstName);
         Assert.assertEquals(driver.findElement(By.xpath("//input[@name='lastName']"))
-                .getDomAttribute("value"), lastName);
+                .getAttribute("value"), lastName);
         Assert.assertEquals(driver.findElement(By.xpath("//label[text()='Employee Id']/parent::div/following-sibling::div/input"))
-                .getDomAttribute("value"), customerID);
+                .getAttribute("value"), customerID);
         // Step 8 click immigration and do more
         //driver.findElement(By.xpath("//a[text()='Immigration']")).click();
 
