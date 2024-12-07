@@ -5,6 +5,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -92,6 +93,42 @@ public class Topic_13_RadioCheckbox {
 
 
 
+
+    }
+
+    @Test
+    public void TC_05_Ubuntu_Checkbox_Radio() {
+        driver.get("https://login.ubuntu.com/");
+        Assert.assertFalse(driver.findElement(By.cssSelector("label.new-user")).isSelected());
+        //driver.findElement(By.xpath("//span[text()='I don’t have an Ubuntu One account']")).click();
+        driver.findElement(By.cssSelector("label.new-user")).click();
+        Assert.assertTrue(driver.findElement(By.cssSelector("input[id='id_new_user']")).isSelected());
+        Assert.assertTrue(driver.findElement(By.xpath("//span[text()='Create account']")).isDisplayed());
+        Assert.assertEquals(Color.fromString(driver.findElement(By
+                .xpath("//button[@data-qa-id='login_button']")).getCssValue("background-color")).asHex(), "#0e8420");
+        driver.findElement(By.cssSelector("input#id_accept_tos")).click();
+        Assert.assertTrue(driver.findElement(By.cssSelector("input#id_accept_tos")).isSelected());
+
+    }
+
+    @Test
+    public void TC_06_GoogleRadio() {
+        driver.get("https://docs.google.com/forms/d/e/1FAIpQLSfiypnd69zhuDkjKgqvpID9kwO29UCzeCVrGGtbNPZXQok0jA/viewform");
+        //Verify truoc khi chon
+        //Assert.assertEquals(driver.findElement(By.xpath("//div[@aria-label='Cần Thơ']"))
+        //        .getAttribute("aria-checked"), "false");
+        Assert.assertTrue(driver.findElement(By.
+                        xpath("//div[@aria-label='Cần Thơ'and @aria-checked ='false']")).isDisplayed());
+        driver.findElement(By.xpath("//div[@aria-label='Cần Thơ']")).click();
+        //Assert.assertEquals(driver.findElement(By.xpath("//div[@aria-label='Cần Thơ']"))
+        //        .getAttribute("aria-checked"), "true");
+        Assert.assertTrue(driver.findElement(By
+                .xpath("//div[@aria-label='Cần Thơ'and @aria-checked ='true']")).isDisplayed());
+        Assert.assertEquals(driver.findElement(By
+                .xpath("//div[@aria-label='Quảng Ninh' and @role='checkbox']")).getAttribute("aria-checked"), "false");
+        driver.findElement(By.xpath("//div[@aria-label='Quảng Ninh' and @role='checkbox']")).click();
+        Assert.assertEquals(driver.findElement(By
+                .xpath("//div[@aria-label='Quảng Ninh' and @role='checkbox']")).getAttribute("aria-checked"), "true");
 
     }
 
