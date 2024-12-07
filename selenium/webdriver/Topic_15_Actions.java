@@ -1,30 +1,43 @@
 package webdriver;
 
+import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.*;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import zmq.ZError;
 
+import java.io.*;
+import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static org.testng.reporters.Files.readFile;
+
 public class Topic_15_Actions {
     WebDriver driver;
     Actions actions;
     WebDriverWait Implicitwait;
+    JavascriptExecutor javascriptExecutor;
 
     @BeforeClass
     public void beforeClass() {
         driver = new FirefoxDriver();
+        //driver = new EdgeDriver();
         actions = new Actions(driver);
+        // JavascriptExecutor la interface, nen ko the declare by new xxx
+        //ma chi cast de ep kieu
+        javascriptExecutor = (JavascriptExecutor) driver;
         //Neu dung cac methods trong Action, thi ko the dung chuot va ban phim duoc
         // nhung ham thuong dung trong actions: scrollToElement(),
         //perform(): bat ky 1 ham nao muon chay thi deu phai co ham perform() o cuoi cung
@@ -163,10 +176,78 @@ public class Topic_15_Actions {
         actions.keyUp(Keys.CONTROL).perform();
         Assert.assertEquals(driver
                 .findElements(By.xpath("//li[@class='ui-state-default ui-selectee ui-selected']")).size(), 4);
+        //updatre check git
+    }
+    @Test
+    public void TC_05_doubleClick() {
+        driver.get("https://automationfc.github.io/basic-form/");
+        WebElement doubleClick = driver.findElement(By.xpath("//button[text()='Double click me']"));
+        if(driver.toString().contains("firefox")){
+            //scrollIntoView, true: keo len mep tren cung cua report/ fail: keo xuong mep duoi cung cua element
+            javascriptExecutor.executeScript("arguments[0].scrollIntoView(true)",doubleClick);
+        }
+        actions.doubleClick(doubleClick).perform();
+        //actions.scrollToElement(doubleClick).perform();
 
+        // se bi loi MoveTargetOutOfBoundsException: Move target (768, 2421) is out of bounds of viewport dimensions (1536, 731)
+        //tren firefox, nhung chrome va edge thi ko bi. Vi vay, firefox thi can dung Javascript
+        Assert.assertEquals(driver.findElement(By.cssSelector("p#demo")).getText(),"Hello Automation Guys!");
     }
 
+    @Test
+    public void TC_06_rightClick() {
+        driver.get("https://swisnl.github.io/jQuery-contextMenu/demo.html");
+        WebElement rightClickElement = driver.findElement(By.xpath("//span[text()='right click me']"));
+        actions.contextClick(rightClickElement).perform();
+        WebElement quitIcon = driver.findElement(By.xpath("//span[text()='Quit']"));
+        Assert.assertTrue(quitIcon.isDisplayed());
+        actions.moveToElement(quitIcon).perform();
+        SleepInSeconds(2);
+        //Assert.assertTrue(driver.findElement(By
+        //            .xpath("//li[@class='context-menu-item context-menu-icon context-menu-icon-quit context-menu-visible context-menu-hover']"))
+        //                 .isDisplayed());
+        actions.click(quitIcon).perform();
+        Alert alert = Implicitwait.until(ExpectedConditions.alertIsPresent());
+        alert.accept();
+        Assert.assertFalse(quitIcon.isDisplayed());
 
+    }
+    @Test
+    public void TC_07_drapDrop() {
+        driver.get("https://automationfc.github.io/kendo-drag-drop/");
+        WebElement smallCircle = driver.findElement(By.cssSelector("div#draggable"));
+        WebElement bigCircle = driver.findElement(By.cssSelector("div#droptarget"));
+        actions.dragAndDrop(smallCircle, bigCircle).perform();
+        Assert.assertEquals(bigCircle.getText(),"You did great!");
+        String bigCircleColor = bigCircle.getCssValue("background-color");
+        Assert.assertEquals(Color.fromString(bigCircleColor).asHex().toLowerCase(), "#03a9f4");
+    }
+    @Test
+    public void TC_08_Drag_And_Drop_HTML5() throws InterruptedException, IOException {
+        driver.get("http://the-internet.herokuapp.com/drag_and_drop");
+
+        String sourceCss = "#column-a";
+        String targetCss = "#column-b";
+        String projectPath = System.getProperty("user.dir");
+        String drapAndDrop = projectPath +"/DrapandDrop/drag_and_drop_helper.js";
+
+        String java_script = getContentFile(drapAndDrop);
+
+        // Inject Jquery lib to site
+        // String jqueryscript = readFile(jqueryPath);
+        // javascriptExecutor.executeScript(jqueryscript);
+
+        // A to B
+        java_script = java_script + "$(\"" + sourceCss + "\").simulateDragDrop({ dropTarget: \"" + targetCss + "\"});";
+        javascriptExecutor.executeScript(java_script);
+        Thread.sleep(3000);
+        //Assert.assertTrue(isElementDisplayed("//div[@id='column-a']/header[text()='B']"));
+
+        // B to A
+        javascriptExecutor.executeScript(java_script);
+        Thread.sleep(3000);
+        //Assert.assertTrue(isElementDisplayed("//div[@id='column-b']/header[text()='B']"));
+    }
     @AfterClass
     public void afterClass() {
         if (driver != null) {
@@ -179,6 +260,23 @@ public class Topic_15_Actions {
             Thread.sleep(timeInSecond * 1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        }
+    }
+    //getContentFile() method
+    public String getContentFile(String filePath) throws IOException {
+        Charset cs = Charset.forName("UTF-8");
+        FileInputStream stream = new FileInputStream(filePath);
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(stream, cs));
+            StringBuilder builder = new StringBuilder();
+            char[] buffer = new char[8192];
+            int read;
+            while ((read = reader.read(buffer, 0, buffer.length)) > 0) {
+                builder.append(buffer, 0, read);
+            }
+            return builder.toString();
+        } finally {
+            stream.close();
         }
     }
 }
