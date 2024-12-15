@@ -10,9 +10,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
-public class Topic_21_Jsexecutor {
+public class Topic_21_javaScriptExecutor {
     WebDriver driver;
     JavascriptExecutor jsExecutor;
 
