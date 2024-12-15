@@ -1,19 +1,22 @@
 package webdriver;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.Random;
+import java.util.Set;
 
 public class Topic_21_javaScriptExecutor {
     WebDriver driver;
     JavascriptExecutor jsExecutor;
+    WebDriverWait wait;
 
 
     @BeforeClass
@@ -23,20 +26,79 @@ public class Topic_21_javaScriptExecutor {
         //Ep kieu tuong minh: ly do webDriver va JavascriptExecutor cung la interface, khi cung loai interface thi can
         //ep tuong minh
         jsExecutor = (JavascriptExecutor) driver;
+        wait = new WebDriverWait(driver,Duration.ofSeconds(10));
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+        //driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(30));
         driver.manage().window().maximize();
     }
 
     @Test
-    public void TC_01_() {
+    public void TC_01_JavaExecutor() {
+        executeForBrowser("window.location = 'https://live.techpanda.org/'");
+        //Sleep de cac ham get document kip thuc thi
+        sleepInSecond(3);
 
+        String textPandaDomain = (String) executeForBrowser("return document.domain;");
+        Assert.assertEquals(textPandaDomain, "live.techpanda.org");
+
+        String homeURL = (String) executeForBrowser("return document.URL");
+        Assert.assertEquals(homeURL, "https://live.techpanda.org/");
+
+        hightlightElement("//a[text()='Mobile']");
+        sleepInSecond(3);
+        clickToElementByJS("//a[text()='Mobile']");
+
+        hightlightElement("//a[@title='Samsung Galaxy']/parent::h2/following-sibling::div[@class='actions']/button");
+        sleepInSecond(3);
+        clickToElementByJS("//a[@title='Samsung Galaxy']/parent::h2/following-sibling::div[@class='actions']/button");
+        Assert.assertTrue(isExpectedTextInInnerText("Samsung Galaxy was added to your shopping cart."));
+
+        scrollToElementOnTop("//a[text()='Customer Service']");
+        hightlightElement("//a[text()='Customer Service']");
+        sleepInSecond(3);
+        clickToElementByJS("//a[text()='Customer Service']");
+        String customerServiceTitle = (String) executeForBrowser("return document.title;");
+        sleepInSecond(3);
+        Assert.assertEquals(customerServiceTitle, "Customer Service");
+
+        scrollToElementOnTop("//input[@id='newsletter']");
+        hightlightElement("//input[@id='newsletter']");
+        sendkeyToElementByJS("//input[@id='newsletter']",generateEmail());
+        hightlightElement("//span[text()='Subscribe']");
+        sleepInSecond(3);
+        clickToElementByJS("//span[text()='Subscribe']");
+
+        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        alert.accept();
+        sleepInSecond(3);
+        Assert.assertTrue(isExpectedTextInInnerText("Thank you for your subscription."));
+
+        navigateToUrlByJS("https://www.facebook.com/");
+        sleepInSecond(3);
+        String facebookDomain = (String) executeForBrowser("return document.domain");
+        Assert.assertEquals(facebookDomain, "www.facebook.com");
     }
     @Test
     public void TC_02_() {
 
     }
     @Test
-    public void TC_03_() {
+    public void TC_03_verifyHTML5Message() {
+        driver.get("https://login.ubuntu.com/");
+        driver.findElement(By.xpath("//span[text()='Log in']")).click();
+        String ubuntuValidationMessage = getElementValidationMessage("//div[contains(@id,'yui_3') and @class='p-form-validation email-input']//input");
+        Assert.assertEquals(ubuntuValidationMessage,"Please fill out this field.");
+
+        driver.switchTo().newWindow(WindowType.TAB).get("https://warranty.rode.com/login");
+        sleepInSecond(5);
+        driver.findElement(By.xpath("//button[@type='submit']")).click();
+        String rodeValidationMessage = getElementValidationMessage("//input[@id='email']");
+        Assert.assertEquals(rodeValidationMessage,"Please enter an email address.");
+    }
+
+    @Test
+    public void TC_04_creatAccount() {
+        executeForBrowser("window.location='https://live.techpanda.org/';");
 
     }
 
@@ -45,6 +107,31 @@ public class Topic_21_javaScriptExecutor {
     public void afterClass() {
         if (driver != null) {
             driver.quit();
+        }
+    }
+
+    public String generateEmail(){
+        return "automation" + new Random().nextInt(99999) + "@gmail.com";
+    }
+
+    public void sleepInSecond(int timeout) {
+        try {
+            Thread.sleep(timeout * 1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void switchToWindowByTitle(String expectedTitle){
+        //Lay het tat ca ID cua cac window
+        Set<String> allID = driver.getWindowHandles();
+        for(String id: allID){
+            driver.switchTo().window(id);
+            String actualTitle = driver.getTitle();
+            sleepInSecond(1);
+            if(actualTitle.equals(expectedTitle)){
+                break;
+            }
         }
     }
 
@@ -64,14 +151,6 @@ public class Topic_21_javaScriptExecutor {
 
     public void scrollToBottomPage() {
         jsExecutor.executeScript("window.scrollBy(0,document.body.scrollHeight)");
-    }
-
-    public void sleepInSecond(int timeout) {
-        try {
-            Thread.sleep(timeout * 1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void navigateToUrlByJS(String url) {
